@@ -13,6 +13,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.port ?? 3002);
+  await app.listen(process.env.TASKS_PORT ?? 3002);
 }
 await bootstrap();

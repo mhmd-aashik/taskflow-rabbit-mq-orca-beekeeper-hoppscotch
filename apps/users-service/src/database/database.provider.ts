@@ -9,7 +9,7 @@ export const databaseProviders = [
   {
     provide: PG_POOL,
     useFactory: () => {
-      const url = process.env.DATABASE_URL;
+      const url = process.env.USERS_DATABASE_URL;
 
       if (!url) {
         throw new Error('DATABASE_URL is missing');
