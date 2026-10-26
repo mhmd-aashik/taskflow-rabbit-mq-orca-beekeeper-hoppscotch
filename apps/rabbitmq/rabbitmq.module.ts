@@ -18,6 +18,20 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           },
         },
       },
+      {
+        name: 'TASK_EVENTS',
+        transport: Transport.RMQ,
+        options: {
+          urls: [
+            process.env.RABBITMQ_URL ??
+              'amqp://taskflow:taskflow_dev@localhost:5672',
+          ],
+          queue: 'taskflow.notifications',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
     ]),
   ],
   exports: [ClientsModule],
