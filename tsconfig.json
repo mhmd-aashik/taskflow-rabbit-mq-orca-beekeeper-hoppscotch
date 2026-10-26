@@ -24,6 +24,9 @@
   "references": [
     {
       "path": "./apps/users-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/tasks-service/tsconfig.app.json"
     }
   ]
 }

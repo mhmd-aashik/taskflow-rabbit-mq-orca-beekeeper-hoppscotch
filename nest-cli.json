@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/taskflow",
   "projects": {
+    "tasks-service": {
+      "type": "application",
+      "root": "apps/tasks-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/tasks-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tasks-service/tsconfig.app.json"
+      }
+    },
     "users-service": {
       "type": "application",
       "root": "apps/users-service",
