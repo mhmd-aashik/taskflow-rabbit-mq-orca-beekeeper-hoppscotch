@@ -4,12 +4,15 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
 
 import { TasksService } from './tasks.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
+import { UpdateTaskDto } from './dto/update-task.dto.js';
 
 @Controller('tasks')
 export class TasksController {
@@ -27,12 +30,19 @@ export class TasksController {
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    const task = await this.tasksService.findById(id);
+    return this.tasksService.findById(id);
+  }
 
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
+  @Get('user/:userId')
+  async findByUserId(@Param('userId', ParseUUIDPipe) userId: string) {
+    return this.tasksService.findByUserId(userId);
+  }
 
-    return task;
+  @Patch(':id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateTaskDto,
+  ) {
+    return this.tasksService.update(id, dto);
   }
 }

@@ -37,4 +37,28 @@ export class TasksRepository {
 
     return task ?? null;
   }
+
+  async findByUserId(userId: string) {
+    return this.db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.createdBy, userId))
+      .orderBy(desc(tasks.createdAt));
+  }
+
+  async update(
+    id: string,
+    data: Partial<Pick<NewTask, 'title' | 'description' | 'status'>>,
+  ) {
+    const [task] = await this.db
+      .update(tasks)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(tasks.id, id))
+      .returning();
+
+    return task ?? null;
+  }
 }
