@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
 
-export interface TaskCreatedEvent {
+import { Injectable, Logger } from '@nestjs/common';
+import { MailService } from '../mail/mail.service.js';
+
+interface TaskCreatedEvent {
   taskId: string;
   title: string;
   createdBy: string;
@@ -12,13 +14,28 @@ export interface TaskCreatedEvent {
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
 
-  async handleTaskCreated(event: TaskCreatedEvent): Promise<void> {
-    this.logger.log('New task notification received');
+  constructor(
+    private readonly mailService: MailService,
+  ) {}
 
-    this.logger.log(`Task ID: ${event.taskId}`);
-    this.logger.log(`Title: ${event.title}`);
-    this.logger.log(`Created By: ${event.createdBy}`);
-    this.logger.log(`Status: ${event.status}`);
-    this.logger.log(`Occurred At: ${event.occurredAt}`);
+  async handleTaskCreated(
+    event: TaskCreatedEvent,
+  ): Promise<void> {
+    this.logger.log(
+      `Processing task.created: ${event.taskId}`,
+    );
+
+    const recipient =
+      process.env.NOTIFICATION_TEST_EMAIL ??
+      'developer@example.com';
+
+    await this.mailService.sendTaskCreatedEmail(
+      recipient,
+      event.title,
+    );
+
+    this.logger.log(
+      `Notification processed for task: ${event.taskId}`,
+    );
   }
 }
