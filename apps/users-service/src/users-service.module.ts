@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { UsersServiceController } from './users-service.controller.js';
-import { UsersServiceService } from './users-service.service.js';
+import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
-  imports: [],
-  controllers: [UsersServiceController],
-  providers: [UsersServiceService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    UsersModule,
+  ],
 })
 export class UsersServiceModule {}
