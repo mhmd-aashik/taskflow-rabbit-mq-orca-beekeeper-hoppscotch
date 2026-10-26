@@ -114,4 +114,10 @@ export class UsersService {
 
     return { message: 'User deleted successfully' };
   }
+
+  async userExists(userId: string): Promise<{ exists: boolean }> {
+    const user = await this.repository.findById(userId);
+
+    return { exists: user !== null };
+  }
 }
