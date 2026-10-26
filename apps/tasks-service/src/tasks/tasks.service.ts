@@ -20,4 +20,8 @@ export class TasksService {
       createdBy: dto.createdBy,
     });
   }
+
+  async findAll() {
+    return this.tasksRepository.findAll();
+  }
 }
