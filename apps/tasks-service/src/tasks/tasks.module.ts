@@ -7,10 +7,16 @@ import { DatabaseModule } from '../database/database.module.js';
 import { TasksController } from './tasks.controller.js';
 import { TasksRepository } from './tasks.repository.js';
 import { TasksService } from './tasks.service.js';
+import { TaskEventsService } from '../rabbitmq/task-events.service.js';
 
 @Module({
   imports: [DatabaseModule, RabbitmqModule],
   controllers: [TasksController],
-  providers: [TasksService, TasksRepository, UsersClientService],
+  providers: [
+    TasksService,
+    TasksRepository,
+    UsersClientService,
+    TaskEventsService,
+  ],
 })
 export class TasksModule {}

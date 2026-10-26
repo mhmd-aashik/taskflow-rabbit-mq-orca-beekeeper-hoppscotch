@@ -18,7 +18,10 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   },
   "files": [],
   "references": [
@@ -27,6 +30,12 @@
     },
     {
       "path": "./apps/tasks-service/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/taskflow/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/notifications-service/tsconfig.app.json"
     }
   ]
 }
