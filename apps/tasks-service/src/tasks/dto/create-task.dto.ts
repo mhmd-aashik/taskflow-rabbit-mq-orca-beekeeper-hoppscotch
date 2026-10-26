@@ -10,6 +10,6 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
-  @IsUUID() 
+  @IsUUID()
   createdBy!: string;
 }
