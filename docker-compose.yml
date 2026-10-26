@@ -25,6 +25,20 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  mailpit:
+    image: docker.io/axllent/mailpit:latest
+    container_name: taskflow-mailpit
+    restart: unless-stopped
+    ports:
+      - '8025:8025'
+      - '1025:1025'
+    environment:
+      MP_MAX_MESSAGES: 5000
+    volumes:
+      - mailpit_data:/data
+    command: ['--database', '/data/mailpit.db']
+
 volumes:
   postgres_data:
   rabbitmq_data:
+  mailpit_data:

@@ -4,22 +4,34 @@ import { TasksRepository } from './tasks.repository.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UsersClientService } from '../users-client/users-client.service.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
+import { TaskEventsService } from '../rabbitmq/task-events.service.js';
 
 @Injectable()
 export class TasksService {
   constructor(
     private readonly tasksRepository: TasksRepository,
     private readonly usersClient: UsersClientService,
+    private readonly taskEventsService: TaskEventsService,
   ) {}
 
   async create(dto: CreateTaskDto) {
     await this.usersClient.validateUser(dto.createdBy);
 
-    return this.tasksRepository.create({
+    const task = await this.tasksRepository.create({
       title: dto.title,
       description: dto.description,
       createdBy: dto.createdBy,
     });
+
+    await this.taskEventsService.emitTaskCreated({
+      taskId: task.id,
+      title: task.title,
+      createdBy: task.createdBy,
+      status: task.status,
+      occurredAt: task.createdAt.toISOString(),
+    });
+
+    return task;
   }
 
   async findAll() {
