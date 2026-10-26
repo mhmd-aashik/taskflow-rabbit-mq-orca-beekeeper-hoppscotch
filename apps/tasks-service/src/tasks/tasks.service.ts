@@ -49,4 +49,14 @@ export class TasksService {
 
     return task;
   }
+
+  async delete(id: string) {
+    const task = await this.tasksRepository.delete(id);
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
+    return task;
+  }
 }

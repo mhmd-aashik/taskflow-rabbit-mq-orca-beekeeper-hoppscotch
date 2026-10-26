@@ -61,4 +61,13 @@ export class TasksRepository {
 
     return task ?? null;
   }
+
+  async delete(id: string) {
+    const [task] = await this.db
+      .delete(tasks)
+      .where(eq(tasks.id, id))
+      .returning();
+
+    return task ?? null;
+  }
 }
