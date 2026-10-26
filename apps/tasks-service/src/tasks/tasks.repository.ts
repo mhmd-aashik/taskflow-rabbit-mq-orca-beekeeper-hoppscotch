@@ -27,4 +27,14 @@ export class TasksRepository {
 
     return tasks;
   }
+
+  async findById(id: string) {
+    const [task] = await this.db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.id, id))
+      .limit(1);
+
+    return task ?? null;
+  }
 }

@@ -24,4 +24,8 @@ export class TasksService {
   async findAll() {
     return this.tasksRepository.findAll();
   }
+
+  async findById(id: string) {
+    return this.tasksRepository.findById(id);
+  }
 }
