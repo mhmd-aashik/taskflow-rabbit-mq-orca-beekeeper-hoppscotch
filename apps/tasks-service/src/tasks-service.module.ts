@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TasksServiceController } from './tasks-service.controller.js';
-import { TasksServiceService } from './tasks-service.service.js';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [],
-  controllers: [TasksServiceController],
-  providers: [TasksServiceService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+  ],
 })
 export class TasksServiceModule {}
