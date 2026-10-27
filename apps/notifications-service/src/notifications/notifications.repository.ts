@@ -44,8 +44,8 @@ export class NotificationsRepository {
     return notification ?? null;
   }
 
-  async markSent(taskId: string) {
-    await this.db
+  async markSent(taskId: string, processingToken: string): Promise<boolean> {
+    const [updated] = await this.db
       .update(notifications)
       .set({
         status: 'SENT',
@@ -55,26 +55,33 @@ export class NotificationsRepository {
         and(
           eq(notifications.taskId, taskId),
           eq(notifications.type, 'TASK_CREATED'),
+          eq(notifications.processingToken, processingToken),
+          eq(notifications.status, 'PROCESSING'),
         ),
-      );
-  }
+      )
+      .returning({ id: notifications.id });
 
-  async markFailed(taskId: string) {
-    await this.db
+    return updated !== undefined;
+  }
+  async markFailed(taskId: string, processingToken: string): Promise<boolean> {
+    const [updated] = await this.db
       .update(notifications)
       .set({
         status: 'FAILED',
         updatedAt: new Date(),
-        processingToken: randomUUID(),
       })
       .where(
         and(
           eq(notifications.taskId, taskId),
           eq(notifications.type, 'TASK_CREATED'),
+          eq(notifications.processingToken, processingToken),
+          eq(notifications.status, 'PROCESSING'),
         ),
-      );
-  }
+      )
+      .returning({ id: notifications.id });
 
+    return updated !== undefined;
+  }
   async claimFailed(taskId: string) {
     const [notification] = await this.db
       .update(notifications)
