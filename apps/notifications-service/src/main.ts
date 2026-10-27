@@ -15,7 +15,12 @@ async function bootstrap() {
         queue: 'taskflow.notifications',
         queueOptions: {
           durable: true,
+          arguments: {
+            'x-dead-letter-exchange': 'taskflow.notifications.dlx',
+            'x-dead-letter-routing-key': 'taskflow.notifications.failed',
+          },
         },
+
         noAck: false,
         prefetchCount: 10,
       },

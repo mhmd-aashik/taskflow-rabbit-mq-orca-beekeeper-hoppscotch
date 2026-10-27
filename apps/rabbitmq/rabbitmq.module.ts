@@ -29,6 +29,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           queue: 'taskflow.notifications',
           queueOptions: {
             durable: true,
+            arguments: {
+              'x-dead-letter-exchange': 'taskflow.notifications.dlx',
+              'x-dead-letter-routing-key': 'taskflow.notifications.failed',
+            },
           },
         },
       },
