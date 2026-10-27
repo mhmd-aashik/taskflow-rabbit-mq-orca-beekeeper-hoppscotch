@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { MailService } from '../mail/mail.service.js';
 import { UsersClientService } from '../users-client/users-client.service.js';
+import { NotificationsRepository } from './notifications.repository.js';
 
 interface TaskCreatedEvent {
   taskId: string;
@@ -18,6 +19,7 @@ export class NotificationsService {
   constructor(
     private readonly mailService: MailService,
     private readonly usersClientService: UsersClientService,
+    private readonly notificationsRepository: NotificationsRepository,
   ) {}
 
   async handleTaskCreated(event: TaskCreatedEvent): Promise<void> {
@@ -33,11 +35,40 @@ export class NotificationsService {
     }
 
     // 3. Send email to the actual user
-    await this.mailService.sendTaskCreatedEmail(user.email, event.title);
+    try {
+      await this.mailService.sendTaskCreatedEmail(user.email, event.title);
+    } catch (error) {
+      await this.notificationsRepository.markFailed(event.taskId);
+      throw error;
+    }
 
     // 4. Log successful processing
     this.logger.log(
       `Notification sent to ${user.email} for task ${event.taskId}`,
     );
+  }
+
+  private async claimNotification(taskId: string): Promise<boolean> {
+    const created = await this.notificationsRepository.createProcessing(taskId);
+
+    if (created) {
+      return true;
+    }
+
+    const existing = await this.notificationsRepository.findByTaskId(taskId);
+
+    if (existing?.status === 'SENT') {
+      this.logger.log(`Skipping duplicate notification for task ${taskId}`);
+
+      return false;
+    }
+
+    if (existing?.status === 'FAILED') {
+      const claimed = await this.notificationsRepository.claimFailed(taskId);
+
+      return claimed !== null;
+    }
+
+    return false;
   }
 }

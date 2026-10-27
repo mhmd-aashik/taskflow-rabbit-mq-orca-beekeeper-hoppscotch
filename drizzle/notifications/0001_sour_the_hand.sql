@@ -1,0 +1,1 @@
+ALTER TABLE "notifications" ADD COLUMN "processing_token" uuid;

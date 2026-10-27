@@ -13,6 +13,7 @@ export const notifications = pgTable(
     taskId: uuid('task_id').notNull(),
     type: varchar('type', { length: 50 }).notNull().default('TASK_CREATED'),
     status: varchar('status', { length: 20 }).notNull().default('PROCESSING'),
+    processingToken: uuid('processing_token'),
     createdAt: timestamp('created_at', {
       withTimezone: true,
     })

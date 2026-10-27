@@ -32,9 +32,6 @@
       "path": "./apps/tasks-service/tsconfig.app.json"
     },
     {
-      "path": "./apps/taskflow/tsconfig.app.json"
-    },
-    {
       "path": "./apps/notifications-service/tsconfig.app.json"
     }
   ]
