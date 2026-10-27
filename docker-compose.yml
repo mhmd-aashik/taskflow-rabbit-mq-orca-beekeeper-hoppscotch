@@ -50,6 +50,27 @@ services:
       - mailpit_data:/data
     command: ['--database', '/data/mailpit.db']
 
+  users-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: users-service
+    image: taskflow-users:dev
+    container_name: taskflow-users-service
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      RABBITMQ_URL: amqp://taskflow:taskflow_dev@rabbitmq:5672
+      USERS_DATABASE_URL: postgresql://taskflow:taskflow_dev@postgres:5432/taskflow_users
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   rabbitmq_data:
