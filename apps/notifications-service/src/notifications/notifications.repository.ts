@@ -87,6 +87,7 @@ export class NotificationsRepository {
       .update(notifications)
       .set({
         status: 'PROCESSING',
+        processingToken: randomUUID(),
         updatedAt: new Date(),
       })
       .where(

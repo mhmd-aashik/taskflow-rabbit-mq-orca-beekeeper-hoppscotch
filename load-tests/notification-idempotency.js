@@ -24,6 +24,9 @@ export function setup() {
 export default function () {
   const response = http.post(`${BASE_URL}/tasks/${TASK_ID}/replay-event`, null);
 
+  console.log(`HTTP Status: ${response.status}`);
+  console.log(`Response: ${response.body}`);
+
   check(response, {
     'event published successfully': (r) => r.status === 200 || r.status === 202,
   });
