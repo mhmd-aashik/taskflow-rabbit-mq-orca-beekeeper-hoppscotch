@@ -9,7 +9,7 @@ import { UsersClientService } from '../users-client/users-client.service.js';
 @Module({
   imports: [MailModule, RabbitmqModule],
   controllers: [NotificationsController],
-  providers: [NotificationsService],
-  exports: [NotificationsService, UsersClientService],
+  providers: [NotificationsService, UsersClientService],
+  exports: [NotificationsService],
 })
 export class NotificationsModule {}
