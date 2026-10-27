@@ -17,4 +17,24 @@ export class UsersRmqController {
 
     return this.usersService.userExists(data.userId);
   }
+
+  @MessagePattern('users.findById')
+  async findUserById(
+    @Payload() data: { userId: string },
+  ): Promise<{ id: string; email: string } | null> {
+    if (!data || !isUUID(data.userId)) {
+      throw new RpcException('Invalid user ID');
+    }
+
+    const user = await this.usersService.findOne(data.userId);
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+    };
+  }
 }
