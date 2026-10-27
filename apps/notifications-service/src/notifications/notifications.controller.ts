@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service.js';
-import { Buffer } from 'node:buffer';
+import type { ConsumeMessage } from 'amqplib';
 
 interface TaskCreatedEvent {
   taskId: string;
@@ -25,7 +25,10 @@ export class NotificationsController {
     const rmqContext = context as RmqContext;
 
     const channel = rmqContext.getChannelRef();
-    const message = rmqContext.getMessage();
+    const message = rmqContext.getMessage() as ConsumeMessage;
+    const retryCount = Number(
+      message.properties.headers?.['x-taskflow-retry-count'] ?? 0,
+    );
 
     this.logger.log(
       `Publisher confirms available: ${typeof channel.waitForConfirms === 'function'}`,
@@ -43,7 +46,31 @@ export class NotificationsController {
         error instanceof Error ? error.stack : String(error),
       );
 
-      channel.nack(message, false, false);
+      if (retryCount >= 3) {
+        this.logger.warn(
+          `Maximum retries reached for task ${event.taskId}. Sending to DLQ.`,
+        );
+
+        channel.nack(message, false, false);
+        return;
+      }
+
+      try {
+        await this.publishRetry(channel, message, retryCount);
+
+        channel.ack(message);
+
+        this.logger.warn(
+          `Retry ${retryCount + 1}/3 scheduled for task ${event.taskId}`,
+        );
+      } catch (retryError) {
+        this.logger.error(
+          `Failed to schedule retry for task ${event.taskId}`,
+          retryError instanceof Error ? retryError.stack : String(retryError),
+        );
+
+        channel.nack(message, false, true);
+      }
     }
   }
 
@@ -51,10 +78,7 @@ export class NotificationsController {
     channel: RmqContext['getChannelRef'] extends (...args: any[]) => infer T
       ? T
       : never,
-    message: {
-      content: Buffer;
-      properties: { headers?: Record<string, unknown> };
-    },
+    message: ConsumeMessage,
     retryCount: number,
   ): Promise<void> {
     const retryQueues = [
@@ -70,7 +94,9 @@ export class NotificationsController {
     }
 
     channel.sendToQueue(queue, message.content, {
+      ...message.properties,
       persistent: true,
+      mandatory: true,
       headers: {
         ...message.properties.headers,
         'x-taskflow-retry-count': retryCount + 1,
